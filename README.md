@@ -1,175 +1,89 @@
-# Projeto Biblioteca — API Django e App Flet
-
-> **Segunda nota da disciplina · Valor: 10,0 pontos · Entrega e defesa: 01/12, em aula**
-
 ## Visão geral
 
-Individualmente ou em dupla, desenvolvam uma **API em Django** que salve registros no banco de dados e um **app em Flet** que consuma essa API para listar, cadastrar, editar e excluir livros.
+Individualmente ou em dupla, vocês vão construir uma **API em Django** que salva registros no banco de dados e um **app em Flet** que usa essa API para listar, cadastrar, editar e excluir. O trabalho é a **segunda nota** da disciplina, e não haverá prova.
 
-- **Formato:** individual ou em dupla, à escolha dos estudantes.
-- **Tema:** acervo de uma biblioteca, igual para todos.
-- **Base:** projeto `loja`, desenvolvido nas aulas. O trabalho aplica o mesmo caminho ao tema Biblioteca.
-- **Avaliação:** o trabalho corresponde à segunda nota da disciplina. Não haverá prova.
-- **Apresentação:** o projeto deve ser demonstrado funcionando, e quem o desenvolveu deve responder às perguntas sobre o código.
+- **Formato:** individual ou em dupla, à escolha de cada um. O tema é o mesmo para todos: Biblioteca.
+- **Base:** o projeto `loja` das aulas é o modelo. O trabalho aplica o mesmo caminho à biblioteca.
+- **Entrega e defesa:** 01/12, em aula. Cada trabalho é apresentado funcionando, e quem fez responde por ele.
 
-## 1. Modelo de dados
+## Tema: Biblioteca
 
-O Model `Livro` deve ter **de 4 a 6 campos**, incluindo pelo menos:
+Todos fazem o mesmo tema: o acervo de uma biblioteca. O Model `Livro` deve ter **de 4 a 6 campos**, com pelo menos um texto, um número e um campo do tipo sim/não. Os campos abaixo são uma sugestão; acrescentar campos próprios é bem-vindo.
 
-- Um campo de texto;
-- Um campo numérico;
-- Um campo do tipo sim/não.
+| Campo | Tipo no Django | Exemplo |
+| --- | --- | --- |
+| titulo | CharField | Dom Casmurro |
+| autor | CharField | Machado de Assis |
+| ano | PositiveIntegerField | 1899 |
+| disponivel | BooleanField | sim |
+| paginas (opcional) | PositiveIntegerField | 256 |
 
-Os campos abaixo são sugestões. Acrescentar campos próprios é bem-vindo.
+## Requisitos da API (Django)
 
-| Campo | Tipo no Django | Exemplo | Observação |
+A API guarda os registros num **Model** (uma tabela no banco SQLite) e responde sempre em **JSON**. As rotas usam o recurso `livros`.
+
+| Método | Rota | O que faz | Sucesso |
 | --- | --- | --- | --- |
-| `titulo` | `CharField` | Dom Casmurro | Texto |
-| `autor` | `CharField` | Machado de Assis | Texto |
-| `ano` | `PositiveIntegerField` | 1899 | Número |
-| `disponivel` | `BooleanField` | Sim | Sim/não |
-| `paginas` | `PositiveIntegerField` | 256 | Opcional |
+| GET | `/livros/` | Lista todos os registros | 200 |
+| GET | `/livros/?busca=python` | Lista só os que atendem ao filtro | 200 |
+| GET | `/livros/<id>/` | Mostra um registro | 200 |
+| POST | `/livros/` | Cadastra um registro com os dados enviados em JSON | 201 |
+| PUT | `/livros/<id>/` | Altera um registro com os dados enviados em JSON | 200 |
+| DELETE | `/livros/<id>/` | Exclui um registro | 204 |
 
-## 2. Requisitos da API — Django
+Além das rotas, a API precisa:
 
-A API deve armazenar os registros em um **Model**, usando uma tabela no banco **SQLite**, e responder em **JSON**. As rotas devem usar o recurso `livros`.
+- **Ter pelo menos um filtro** pela URL, como busca por texto ou só os disponíveis.
+- **Validar o que recebe:** campos obrigatórios preenchidos e valores que fazem sentido (por exemplo, preço maior que zero). Quando algo falha, responde **400** com `{"erro": "mensagem explicando o problema"}`.
+- **Responder 404** quando o id pedido não existe, também com `{"erro": "..."}`.
+- **Começar com dados:** pelo menos 5 registros cadastrados antes da defesa.
 
-### Rotas obrigatórias
+## Requisitos do app (Flet)
 
-| Método | Rota | Funcionalidade | Status de sucesso |
-| --- | --- | --- | --- |
-| `GET` | `/livros/` | Listar todos os registros | `200` |
-| `GET` | `/livros/?busca=python` | Listar os registros que atendem ao filtro | `200` |
-| `GET` | `/livros/<id>/` | Consultar um registro | `200` |
-| `POST` | `/livros/` | Cadastrar um registro com os dados enviados em JSON | `201` |
-| `PUT` | `/livros/<id>/` | Alterar um registro com os dados enviados em JSON | `200` |
-| `DELETE` | `/livros/<id>/` | Excluir um registro | `204` |
+O app não guarda dados: tudo o que ele mostra vem da API, e tudo o que ele muda vai para a API, usando a biblioteca `requests`.
 
-### Filtros
+- **Listar:** mostra os registros vindos de `GET`, com os campos principais de cada um.
+- **Filtrar:** usa o filtro da API, por exemplo um campo de busca.
+- **Cadastrar e editar:** um formulário que envia `POST` (novo) ou `PUT` (edição) e atualiza a lista em seguida.
+- **Excluir:** pede confirmação antes de enviar `DELETE`.
+- **Tratar erros:**
+  - servidor desligado: o app avisa, em vez de travar ou fechar;
+  - erro 400: mostra ao usuário a mensagem que a API devolveu;
+  - erro 404: avisa que o registro não existe mais.
 
-Implementar **pelo menos um filtro pela URL**, como busca por texto ou listagem apenas dos livros disponíveis.
+## Cronograma
 
-### Validação e erros
+Cada aula ensina a parte que a dupla aplica no próprio tema até a aula seguinte. As etapas servem para orientar e não valem nota.
 
-- Validar os campos obrigatórios e os valores recebidos, garantindo que façam sentido.
-- Quando a validação falhar, responder com **status `400`** e uma mensagem explicando o problema:
+## Entrega
 
-```json
-{
-  "erro": "Mensagem explicando o problema"
-}
-```
+Até o início da aula de 01/12, um arquivo `.zip` com o seu nome (ou os nomes da dupla), contendo:
 
-- Quando o ID solicitado não existir, responder com **status `404`**, também no formato:
+- `api/`: o projeto Django, com o `db.sqlite3` (para os registros irem junto) e o `requirements.txt`;
+- `app/`: o app Flet;
+- `README.md`: o nome de quem fez, a lista de rotas da API e como rodar os dois projetos.
 
-```json
-{
-  "erro": "Registro não encontrado"
-}
-```
+Não envie a pasta `.venv`: ela é grande e não funciona em outro computador.
 
-### Dados iniciais
+Criar um repositório no Github compartilhado com lucas.pires@vacaria.ifrs.edu.br desde o início do projeto e salvar lá o andamento no Projeto. Não serão aceitos commits de códigos inteiros.
 
-O banco deve conter **pelo menos 5 registros cadastrados antes da defesa**.
+## Avaliação
 
-## 3. Requisitos do app — Flet
+O trabalho vale de 0 a 10. Em dupla, a nota é a mesma para os dois.
 
-O app **não deve guardar dados**: tudo o que exibe deve vir da API, e todas as alterações devem ser enviadas à API usando a biblioteca **`requests`**.
-
-| Funcionalidade | Requisito |
+| Critério | Pontos |
 | --- | --- |
-| **Listar** | Exibir os registros obtidos por `GET`, mostrando os campos principais de cada livro. |
-| **Filtrar** | Usar o filtro da API, por exemplo, por meio de um campo de busca. |
-| **Cadastrar** | Enviar os dados de um formulário por `POST` e atualizar a lista em seguida. |
-| **Editar** | Enviar os dados de um formulário por `PUT` e atualizar a lista em seguida. |
-| **Excluir** | Pedir confirmação antes de enviar `DELETE`. |
-
-### Tratamento de erros
-
-| Situação | Comportamento esperado |
-| --- | --- |
-| Servidor desligado | Avisar o usuário, sem travar ou fechar o app. |
-| Erro `400` | Mostrar ao usuário a mensagem devolvida pela API. |
-| Erro `404` | Avisar que o registro não existe mais. |
-
-## 4. Cronograma
-
-Cada aula ensina uma parte que os estudantes devem aplicar ao próprio projeto até a aula seguinte.
-
-As etapas servem para orientar o desenvolvimento e **não valem nota**.
-
-## 5. Repositório no GitHub
-
-- Criar um repositório **desde o início do projeto**.
-- Compartilhar o repositório com **lucas.pires@vacaria.ifrs.edu.br**.
-- Salvar o andamento do projeto no repositório, registrando sua evolução.
-- **Não serão aceitos commits de códigos inteiros.**
-
-## 6. Entrega
-
-**Prazo:** até o início da aula de **01/12**.
-
-Entregar um arquivo **`.zip`**, identificado com o nome do estudante ou com os nomes da dupla, contendo:
-
-```text
-Nome_do_estudante_ou_dupla.zip
-├── api/
-│   ├── ... projeto Django
-│   ├── db.sqlite3
-│   └── requirements.txt
-├── app/
-│   └── ... app Flet
-└── README.md
-```
-
-| Item | Conteúdo obrigatório |
-| --- | --- |
-| `api/` | Projeto Django, banco `db.sqlite3` com os registros e `requirements.txt`. |
-| `app/` | Código do app Flet. |
-| `README.md` | Nome de quem desenvolveu, lista de rotas da API e instruções para executar os dois projetos. |
-
-> **Não incluir a pasta `.venv`.** Ela é grande e não funciona em outro computador.
-
-[Enviar o trabalho no Moodle](https://moodle.vacaria.ifrs.edu.br/mod/assign/view.php?id=114804)
-
-## 7. Avaliação
-
-O trabalho vale **de 0 a 10**. Em dupla, a nota é a mesma para os dois integrantes.
-
-| Critério | Pontuação |
-| --- | ---: |
-| API: rotas de leitura — lista, consulta de um registro e filtro | 2,0 |
-| API: `POST`, `PUT` e `DELETE` salvando no banco | 2,0 |
+| API: rotas de leitura (lista, um registro, filtro) | 2,0 |
+| API: POST, PUT e DELETE salvando no banco | 2,0 |
 | API: validação e códigos de status corretos | 2,0 |
 | Flet: listar, filtrar e excluir com confirmação | 1,5 |
 | Flet: formulário de cadastro e edição | 1,5 |
 | Flet: tratamento de erros | 1,0 |
 | **Total** | **10,0** |
 
-## 8. Defesa — 01/12
+## Defesa (01/12)
 
-Cada trabalho terá **10 minutos** de apresentação.
+Cada trabalho tem 10 minutos:
 
-### Demonstração — 4 minutos
-
-Demonstrar as ações **nesta ordem**:
-
-1. Listar os livros.
-2. Filtrar os registros.
-3. Cadastrar um livro.
-4. Editar um livro.
-5. Excluir um livro.
-6. Provocar um erro e mostrar seu tratamento.
-
-### Perguntas — 6 minutos
-
-Quem desenvolveu o trabalho deverá explicar partes do código escolhidas na hora. Exemplos de perguntas:
-
-- O que determinada rota faz?
-- Por que a API responde `400` em certo caso?
-- Como o app envia os dados para a API?
-
-## Links de referência
-
-- [Entrega no Moodle](https://moodle.vacaria.ifrs.edu.br/mod/assign/view.php?id=114804)
-- [Códigos das aulas](https://moodle.vacaria.ifrs.edu.br/mod/resource/view.php?id=113220)
+1. **Demonstração (4 min):** listar, filtrar, cadastrar, editar, excluir e provocar um erro, nessa ordem.
+2. **Perguntas (6 min):** quem fez explica partes do código escolhidas na hora. Por exemplo: o que uma rota faz, por que a API responde 400 em certo caso, como o app envia os dados para a API.
