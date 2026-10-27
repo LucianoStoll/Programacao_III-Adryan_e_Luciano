@@ -1,5 +1,7 @@
 ## Visão geral
 
+GRUPO: Adryan & Luciano
+
 Individualmente ou em dupla, vocês vão construir uma **API em Django** que salva registros no banco de dados e um **app em Flet** que usa essa API para listar, cadastrar, editar e excluir. O trabalho é a **segunda nota** da disciplina, e não haverá prova.
 
 - **Formato:** individual ou em dupla, à escolha de cada um. O tema é o mesmo para todos: Biblioteca.
