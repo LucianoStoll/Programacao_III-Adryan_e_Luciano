@@ -11,4 +11,4 @@ class Livro(models.Model):
     paginas = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return self.nome
+        return self.titulo
