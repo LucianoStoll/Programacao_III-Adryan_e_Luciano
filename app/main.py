@@ -9,16 +9,32 @@ TEXTO = "#CDECEF"
 TEXTO_SECUNDARIO = "#A9C1C3"
 
 class Biblioteca:
-
     
     def __init__(self):
+
+        self.api = Api()
+
+        self.listar_livros = ft.ListView()
 
         self.titulo = ft.Text(
             "Biblioteca",
             size= 20,
             weight=ft.FontWeight.BOLD,
-
         )
+
+    def Listar_Livros(self):
+        Livros = self.api.listar()
+
+        self.listar_livros.controls.clear()
+
+        for livro in Livros["Livros"]:
+            self.listar_livros.controls.append(
+                ft.Text(
+                    f'Titulo: {livro["titulo"]}\n'
+                    f'Autor: {livro["autor"]}\n'
+                    f'Ano: {livro["ano"]}\n'
+                )
+            )
 
     def criar_aba_lateral(self):
         return ft.Container(
@@ -40,14 +56,18 @@ class Biblioteca:
         )
 
     def criar_principal(self):
+        self.Listar_Livros()
+
         return ft.Container(
             expand=True,
             padding=30,
             content=ft.Column(
                 controls=[
                     self.titulo,
-                    ft.FloatingActionButton(icon=ft.Icons.ADD, content="Adicionar Livro", on_click=Api.criar),
+                    self.listar_livros,
+                    #ft.FloatingActionButton(icon=ft.Icons.ADD, content="Adicionar Livro", on_click=Api.criar),
                 ],
+                expand=True,
             ),
         )
 

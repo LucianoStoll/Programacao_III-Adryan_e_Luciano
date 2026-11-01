@@ -1,14 +1,16 @@
-from catalogo.models import Livro
+import requests
 
 class Api:
 
 
     def __init__(self):
-        pass
+        self.ApiUrl = "http://127.0.0.1:8000"
+        
 
-    def listar():
-
-        pass
+    def listar(self):
+        Livros = requests.get(f"{self.ApiUrl}/livros/")
+        return Livros.json()
+        
 
     def criar():
         print("Criar livro")
