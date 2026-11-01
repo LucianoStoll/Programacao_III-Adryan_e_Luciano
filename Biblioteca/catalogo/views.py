@@ -37,7 +37,7 @@ def alterar(request, p):
     p.paginas = dados.get("paginas")
     p.disponivel = dados.get("disponivel")
     p.save()
-    return JsonResponse(para_dict(p))
+    return JsonResponse(livro_para_json(p))
 
 def cadastrar(request): #Tem que mudar muita coisa aqui #acho q ta bão já
     dados = ler_json(request)
@@ -65,7 +65,7 @@ def cadastrar(request): #Tem que mudar muita coisa aqui #acho q ta bão já
 
         )
     
-    return JsonResponse(para_dict(p), status=201)
+    return JsonResponse(livro_para_json(p), status=201)
 
 @csrf_exempt
 def livro(request, idlivro):
@@ -82,8 +82,18 @@ def livro(request, idlivro):
         p.delete()
 
         return HttpResponse(status=204)
-    return JsonResponse(para_dict(p))
+    return JsonResponse(livro_para_json(p))
 
+# isso aqui transforma o objeto livro em um json
+def livro_para_json(p):
+    return {
+        "id": p.id,
+        "titulo": p.titulo,
+        "autor": p.autor,
+        "ano": int(p.ano),
+        "páginas": int(p.paginas),
+        "disponível": bool(p.disponivel)
+    }
 
 @csrf_exempt
 def lista_livros(request):
