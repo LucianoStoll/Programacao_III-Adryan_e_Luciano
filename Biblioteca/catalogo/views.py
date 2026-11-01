@@ -39,42 +39,65 @@ def alterar(request, p):
     p.save()
     return JsonResponse(para_dict(p))
 
-def cadastrar(request):#Tem que mudar muita coisa aqui
+def cadastrar(request): #Tem que mudar muita coisa aqui #acho q ta bão já
     dados = ler_json(request)
     if dados is None:
+
         return JsonResponse({"erro": "JSON inválido"}, status=400)
     erro = validar(dados)
+
     if erro:
         return JsonResponse({"erro": erro}, status=400)
     id = dados.get("id")
-    if not isinstance(id, int):
-        return JsonResponse({"erro": "O ID é obrigatório"}, status=400)
-    if Livro.objects.filter(id=id).exists():
-        return JsonResponse({"erro": "Já existe um livro com esse ID"}, status=400)
-    p = Livro.objects.create(id=id, id=dados["id"],
-        preco=dados["preco"], estoque=dados.get("estoque", 0))
+
+    #Não precisa disso, o django já cria o ID pa nois
+    #if not isinstance(id, int):
+        #return JsonResponse({"erro": "O ID é obrigatório"}, status=400)
+    #if Livro.objects.filter(id=id).exists():
+        #return JsonResponse({"erro": "Já existe um livro com esse ID"}, status=400)
+    
+    p = Livro.objects.create(
+        titulo=dados["titulo"], 
+        autor=dados["autor"],
+        ano=dados["ano"],
+        disponivel=dados["disponivel"],
+        paginas=dados["paginas"],
+
+        )
+    
     return JsonResponse(para_dict(p), status=201)
 
 @csrf_exempt
 def livro(request, idlivro):
     try:
         p = Livro.objects.get(id=idlivro)
+
     except Livro.DoesNotExist:
         return JsonResponse({"erro": "Livro não encontrado"}, status=404)
+    
     if request.method == "PUT":
         return alterar(request, p)
+    
     if request.method == "DELETE":
         p.delete()
+
         return HttpResponse(status=204)
     return JsonResponse(para_dict(p))
+
 
 @csrf_exempt
 def lista_livros(request):
     if request.method == "POST":
         return cadastrar(request)
+    
     dados = []
     for p in Livro.objects.all():
-        dados.append({"id": p.id, "titulo": p.titulo,"autor": p.autor,
-    "ano": int(p.ano), "páginas": int(p.paginas),"disponível": bool(p.disponivel)}) 
+        dados.append({"id": p.id, 
+                    "titulo": p.titulo,
+                    "autor": p.autor,
+                    "ano": int(p.ano),  
+                    "páginas": int(p.paginas),
+                    "disponível": bool(p.disponivel)}) 
+        
     return JsonResponse({"Livros": dados})
 
