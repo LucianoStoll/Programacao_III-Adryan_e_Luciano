@@ -7,6 +7,7 @@ class Api:
         pass
 
     def criar():
+        print("Criar livro")
         pass
 
     def excluir():

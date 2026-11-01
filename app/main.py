@@ -1,6 +1,13 @@
 import flet as ft
 from apiClient import Api
 
+FUNDO = "#192C30"
+MENU = "#243F46"
+CARD = "#253F46"
+DESTAQUE = "#FED36A"
+TEXTO = "#CDECEF"
+TEXTO_SECUNDARIO = "#A9C1C3"
+
 class Biblioteca:
 
     
@@ -13,56 +20,58 @@ class Biblioteca:
 
         )
 
+    def criar_aba_lateral(self):
+        return ft.Container(
+            width=100,
+            bgcolor=MENU,
+            border_radius=10,
+            padding=5,
+            content=ft.Column(
+                controls=[
+                    ft.Icon(
+                        ft.Icons.LOCAL_LIBRARY,
+                        size=45,
+                        color=TEXTO,
+                    ),
+                    ft.Button(content="Home"),
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+        )
+
+    def criar_principal(self):
+        return ft.Container(
+            expand=True,
+            padding=30,
+            content=ft.Column(
+                controls=[
+                    self.titulo,
+                    ft.FloatingActionButton(icon=ft.Icons.ADD, content="Adicionar Livro", on_click=Api.criar),
+                ],
+            ),
+        )
+
     def add_tela(self):
-
-        ContAba = ft.Column(
-            alignment=ft.MainAxisAlignment.START,
+        return ft.Row(
             controls=[
-                ft.Text("Biblioteca", size=24),
-                
-            ]
-
-        )
-
-        AbaLateral = ft.Stack(
-            controls=[
-                ft.Container(
-                    left=-10,
-                    top=-10,
-                    width=200,
-                    height=999,
-                    content=ft.Container(
-                                    width=200,
-                                    height=999,
-                                    padding=5,
-                                    bgcolor=ft.Colors.GREY,
-                                    content=ft.Column(
-                                        controls=[
-                                            ContAba,
-                                        ]
-                                    )
-                                )
-                ),
+                self.criar_aba_lateral(),
+                self.criar_principal(),
             ],
+            expand=True,
+            spacing=0,
         )
-  
-            
-            
-            
-        
-        
-
-        return AbaLateral
 
     
 def main(page: ft.Page):
     page.title = "Biblioteca"
+    page.bgcolor = FUNDO
+    page.padding = 0
     page.add(Biblioteca().add_tela())
 
 ft.run(main)
 
 
-    
+     
 
 
     
@@ -70,4 +79,3 @@ ft.run(main)
     
 
     
-
