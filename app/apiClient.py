@@ -8,9 +8,17 @@ class Api:
         
 
     def listar(self):
-        Livros = requests.get(f"{self.ApiUrl}/livros/")
-        return Livros.json()
-        
+
+        try:
+            response = requests.get(f"{self.ApiUrl}/livros/")
+            response.raise_for_status()
+            livros = response.json()
+            return livros
+
+        except requests.exceptions.RequestException as e:
+            print(f"Erro ao listar livros: {e}")
+            return 
+
 
     def criar():
         print("Criar livro")

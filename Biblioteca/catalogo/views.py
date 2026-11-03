@@ -3,19 +3,25 @@ from django.http import Http404, JsonResponse, HttpResponse
 from .models import Livro
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
 
 # Create your views here.
 def validar(dados):
     if not dados.get("titulo"):
         return "O título é obrigatório"
     ano = dados.get("ano")
+
     if not isinstance(ano, (int)) or ano <= 0:
         return "O ano deve ser um número maior que zero"
+    
     paginas = dados.get("paginas", 0)
+
     if not isinstance(paginas, (int)) or paginas <= 0:
             return "O livro deve ter pelo menos uma página"
+    
     if not dados.get("autor"):
             return "O autor é obrigatório"
+    
     return None
 
 def ler_json(request):
@@ -96,18 +102,33 @@ def livro_para_json(p):
     }
 
 @csrf_exempt
-def lista_livros(request):
-    if request.method == "POST":
-        return cadastrar(request)
-    
-    dados = []
-    for p in Livro.objects.all():
-        dados.append({"id": p.id, 
+def lista_livros(request): #filtro por titulo autor ano e nº paginas
+
+    livros_Filtrados = [] #lista com livros Filtardos
+    livros = Livro.objects.all() # busca todos os livros
+
+    buscar = request.GET.get("busca", "").strip()
+
+    if buscar:
+            livros = livros.filter(
+                Q(titulo__icontains=buscar) |
+                Q(autor__icontains=buscar)  |
+                Q(ano__icontains=buscar)    |
+                Q(paginas__icontains=buscar)
+            )
+
+    for p in livros:
+            livros_Filtrados.append({
+                    "id": p.id,
                     "titulo": p.titulo,
                     "autor": p.autor,
-                    "ano": int(p.ano),  
+                    "ano": int(p.ano),
                     "páginas": int(p.paginas),
-                    "disponível": bool(p.disponivel)}) 
+                    "disponível": bool(p.disponivel)
+                })
         
-    return JsonResponse({"Livros": dados})
+    return JsonResponse({"Livros": livros_Filtrados}, status=200)
+
+
+       
 

@@ -24,6 +24,9 @@ class Biblioteca:
 
     def Listar_Livros(self):
         Livros = self.api.listar()
+        
+        if not Livros:
+            return
 
         self.listar_livros.controls.clear()
 
@@ -35,7 +38,8 @@ class Biblioteca:
                     f'Ano: {livro["ano"]}\n'
                 )
             )
-
+        
+    
     def criar_aba_lateral(self):
         return ft.Container(
             width=100,
